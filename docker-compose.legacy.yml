@@ -1,0 +1,9 @@
+version: "2.1"
+services:
+  mikhmon:
+    image: animegasan/mikpos:latest
+    container_name: mikpos
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+

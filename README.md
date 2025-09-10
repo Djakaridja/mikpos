@@ -31,31 +31,45 @@ The architectures supported by this image are:
 
 ---
 
-## Usage
-Here are some example snippets to help you get started creating a container.
-### docker-compose (recommended)
-```yaml
----
-version: "2.1"
-services:
-  mikhmon:
-    image: animegasan/mikpos:latest
-    container_name: mikpos
-    ports:
-      - 8080:8080
-    restart: unless-stopped
-```
-### docker cli
+## Nouvelle architecture: FastAPI + React + PostgreSQL
+
+Cette application a été refactorée pour s'exécuter via Docker avec:
+
+- Backend FastAPI (`http://localhost:8000`)
+- Frontend React + Vite (`http://localhost:5173`)
+- Base de données PostgreSQL (`localhost:5432`)
+
+L'ancienne stack (Mikpos) est conservée dans `docker-compose.legacy.yml`.
+
+### Démarrage
 
 ```bash
-docker run -d \
-  --name=mikpos \
-  -p 8080:8080 \
-  --restart unless-stopped \
-  animegasan/mikpos:latest
+docker compose up --build
 ```
 
-***Note : If API service in mikrotik changed, add API service after the Mikrotik IP in Add Router form. `<IP_MIKROTIK>:API_SERVICES`***
+Ensuite:
+- Frontend: `http://localhost:5173`
+- Backend health: `http://localhost:8000/health`
+
+Le frontend interroge l'endpoint `/health` pour vérifier l'état du backend.
+
+### Variables d'environnement
+
+- Backend:
+  - `DATABASE_URL` (défaut: `postgresql+psycopg2://app:app@db:5432/app`)
+  - `CORS_ORIGINS` (défaut: `http://localhost:5173`)
+- Frontend:
+  - `VITE_API_URL` (défaut: `http://localhost:8000`)
+
+### Migrations (Alembic)
+
+Appliquer les migrations manuellement si nécessaire:
+
+```bash
+docker compose exec backend alembic upgrade head
+```
+
+Un exemple de table `examples` est inclus.
 
 ---
 
